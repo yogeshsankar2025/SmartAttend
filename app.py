@@ -137,8 +137,18 @@ def students():
 {% if rows %}<div class="tablewrap"><table><tr><th>Name</th><th>Register No.</th><th>Face samples</th><th>Action</th></tr>
 {% for s in rows %}<tr><td>{{s.name}}</td><td>{{s.reg_no}}</td><td>{{ counts.get(s.id,0) }}</td><td><a class="btn" href="{{url_for('enroll',student_id=s.id)}}">Capture face</a></td></tr>{% endfor %}</table></div>{% else %}<p>No students yet.</p>{% endif %}
 <form method="post" action="{{url_for('train')}}"><button class="secondary">Train / retrain face model</button></form></section>""",
-rows=rows,counts={int(s["id"]):len([x for x in os.listdir(os.path.join(FACE_DIR,str(s["id"]))) if x.endswith(".jpg"]) if os.path.isdir(os.path.join(FACE_DIR,str(s["id"]))) else 0 for s in rows})
-
+rows=rows,
+counts={
+    int(s["id"]): (
+        len([
+            x for x in os.listdir(os.path.join(FACE_DIR, str(s["id"])))
+            if x.endswith(".jpg")
+        ])
+        if os.path.isdir(os.path.join(FACE_DIR, str(s["id"])))
+        else 0
+    )
+    for s in rows
+}
 @app.route("/enroll/<int:student_id>")
 @login_required
 def enroll(student_id):
